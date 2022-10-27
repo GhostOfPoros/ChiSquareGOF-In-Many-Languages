@@ -1,10 +1,9 @@
 use std::io;
 use std::io::Write;
 
+const CRITICAL_VALUES: [f64; 9] = [3.841, 5.991, 7.815, 9.488, 11.070, 12.592, 14.067, 15.507, 16.919];
+
 fn main() {
-
-    const CRITICAL_VALUES: [f64; 9] = [3.841, 5.991, 7.815, 9.488, 11.070, 12.592, 14.067, 15.507, 16.919];
-
     println!("This program calculates if the null hypothesis is");
     println!("accpted or rejected for a critical value of 0.05.");
     
@@ -15,7 +14,11 @@ fn main() {
     let expected_value = get_float_input("Expected value: ");
     println!("{expected_value}");
 
+    let observed_value = get_float_input("Observed value: ");
+    println!("{observed_value}");
 
+    let chi_value = chi_square_calculation(expected_value, observed_value);
+    println!("{chi_value}");
 }
 
 // Checks whether the compared value is between minimum and maximum
@@ -75,4 +78,16 @@ fn get_float_input(message: &str) -> f64 {
         return expected_value;
     }
 
+}
+
+fn chi_square_calculation (expected: f64, observed: f64) -> f64 {
+    let mut chi_value = observed - expected;
+    chi_value *= chi_value;
+    chi_value = chi_value / expected;
+
+    return chi_value;
+}
+
+fn get_critical_value (critical_value: usize) -> f64 {
+    return CRITICAL_VALUES[critical_value];
 }
