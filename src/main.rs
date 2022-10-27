@@ -13,12 +13,6 @@ fn main() {
 
     let expected_value = get_float_input("Expected value: ");
     println!("{expected_value}");
-
-    let observed_value = get_float_input("Observed value: ");
-    println!("{observed_value}");
-
-    let chi_value = chi_square_calculation(expected_value, observed_value);
-    println!("{chi_value}");
 }
 
 // Checks whether the compared value is between minimum and maximum
@@ -80,7 +74,7 @@ fn get_float_input(message: &str) -> f64 {
 
 }
 
-fn chi_square_calculation (expected: f64, observed: f64) -> f64 {
+fn chi_square_calculation(expected: f64, observed: f64) -> f64 {
     let mut chi_value = observed - expected;
     chi_value *= chi_value;
     chi_value = chi_value / expected;
@@ -88,6 +82,41 @@ fn chi_square_calculation (expected: f64, observed: f64) -> f64 {
     return chi_value;
 }
 
-fn get_critical_value (critical_value: usize) -> f64 {
+fn get_critical_value(critical_value: usize) -> f64 {
     return CRITICAL_VALUES[critical_value];
+}
+
+fn get_chi_sum(degrees: i8, expected_value: f64, observed_value: f64) -> f64 {
+    let mut counter = degrees;
+    let mut chi_sum: f64 = 0.0;
+    while degrees != 0 {
+        let observed_value = get_float_input("Observed value: ");
+        let chi_value = chi_square_calculation(expected_value, observed_value);
+        chi_sum = chi_sum + chi_value;
+
+        print!("Continue? (Y/n): ");
+        io::stdout().flush().unwrap();
+
+        let mut continue_confirmation = String::new();
+        let result = io::stdin()
+            .read_line(&mut continue_confirmation);
+        if let Err(_) = result {
+            continue
+        }
+
+        'confirmation: loop {
+            continue_confirmation = str::to_lowercase(&continue_confirmation);
+            if continue_confirmation == "y"{
+                break 'confirmation;
+            }
+            else if continue_confirmation == "n"{
+                return chi_sum;
+            }
+            else {
+                continue;
+            }
+        }
+        counter -= 1;
+    }
+    return chi_sum;
 }
