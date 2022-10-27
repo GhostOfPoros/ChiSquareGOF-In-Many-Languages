@@ -12,6 +12,10 @@ fn main() {
     let degrees_of_freedom = possibility_input();
     println!("{degrees_of_freedom}");
 
+    let expected_value = get_float_input("Expected value: ");
+    println!("{expected_value}");
+
+
 }
 
 // Checks whether the compared value is between minimum and maximum
@@ -32,9 +36,11 @@ fn possibility_input() -> i8 {
         io::stdout().flush().unwrap(); // Flush stdout immediately
         let mut degrees_of_freedom = String::new();
 
-        io::stdin()
-            .read_line(&mut degrees_of_freedom)
-            .expect("Invalid input!");
+        let result = io::stdin()
+            .read_line(&mut degrees_of_freedom);
+        if let Err(_) = result {
+            continue
+        }
 
         let degrees_of_freedom: i8 = match degrees_of_freedom.trim().parse() {
             Ok(num) => num,
@@ -48,4 +54,25 @@ fn possibility_input() -> i8 {
             continue;
         }
     }
+}
+
+fn get_float_input(message: &str) -> f64 {
+    loop {
+        print!("{message}");
+        io::stdout().flush().unwrap();
+
+        let mut expected_value = String::new();
+        let result = io::stdin()
+            .read_line(&mut expected_value);
+        if let Err(_) = result {
+            continue
+        }
+
+        let expected_value: f64 = match expected_value.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+        return expected_value;
+    }
+
 }
