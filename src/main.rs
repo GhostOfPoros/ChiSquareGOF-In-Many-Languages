@@ -5,14 +5,25 @@ const CRITICAL_VALUES: [f64; 9] = [3.841, 5.991, 7.815, 9.488, 11.070, 12.592, 1
 
 fn main() {
     println!("This program calculates if the null hypothesis is");
-    println!("accpted or rejected for a critical value of 0.05.");
+    println!("accepted or rejected for a critical value of 0.05.");
+    println!();
     
-    
-    let degrees_of_freedom = possibility_input();
-    println!("{degrees_of_freedom}");
+    let possibilities = possibility_input();
 
     let expected_value = get_float_input("Expected value: ");
-    println!("{expected_value}");
+
+    let chi_sum = get_chi_sum(possibilities, expected_value);
+
+    println!();
+    println!("The expected value is {expected_value}");
+    println!("The possibilities is {possibilities}");
+    println!("Chi sum: {chi_sum}");
+    if chi_sum > get_critical_value(possibilities.try_into().unwrap()) {
+        println!("Null hypothesis is rejected.")
+    }
+    else {
+        println!("Null hypothesis is accepted.")
+    }
 }
 
 // Checks whether the compared value is between minimum and maximum
@@ -31,24 +42,21 @@ fn possibility_input() -> i8 {
     loop {
         print!("Please input the number of possibilities: ");
         io::stdout().flush().unwrap(); // Flush stdout immediately
-        let mut degrees_of_freedom = String::new();
+        let mut possibilities = String::new();
 
         let result = io::stdin()
-            .read_line(&mut degrees_of_freedom);
+            .read_line(&mut possibilities);
         if let Err(_) = result {
             continue
         }
 
-        let degrees_of_freedom: i8 = match degrees_of_freedom.trim().parse() {
+        let possibilities: i8 = match possibilities.trim().parse() {
             Ok(num) => num,
             Err(_) => continue,
         };
 
-        if check_valid_input(0, 9, degrees_of_freedom) == true {
-        return degrees_of_freedom - 1;
-        }
-        else {
-            continue;
+        if check_valid_input(0, 9, possibilities) {
+            break possibilities;
         }
     }
 }
@@ -86,37 +94,12 @@ fn get_critical_value(critical_value: usize) -> f64 {
     return CRITICAL_VALUES[critical_value];
 }
 
-fn get_chi_sum(degrees: i8, expected_value: f64, observed_value: f64) -> f64 {
-    let mut counter = degrees;
+fn get_chi_sum(possibilities: i8, expected_value: f64) -> f64 {
     let mut chi_sum: f64 = 0.0;
-    while degrees != 0 {
+    for _ in 0..possibilities {
         let observed_value = get_float_input("Observed value: ");
         let chi_value = chi_square_calculation(expected_value, observed_value);
         chi_sum = chi_sum + chi_value;
-
-        print!("Continue? (Y/n): ");
-        io::stdout().flush().unwrap();
-
-        let mut continue_confirmation = String::new();
-        let result = io::stdin()
-            .read_line(&mut continue_confirmation);
-        if let Err(_) = result {
-            continue
-        }
-
-        'confirmation: loop {
-            continue_confirmation = str::to_lowercase(&continue_confirmation);
-            if continue_confirmation == "y"{
-                break 'confirmation;
-            }
-            else if continue_confirmation == "n"{
-                return chi_sum;
-            }
-            else {
-                continue;
-            }
-        }
-        counter -= 1;
     }
     return chi_sum;
 }
